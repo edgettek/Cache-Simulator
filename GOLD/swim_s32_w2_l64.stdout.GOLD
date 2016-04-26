@@ -1,0 +1,5 @@
+Ways: 2; Sets: 256; Line Size: 64B
+Tag: 18 bits; Index: 8 bits; Offset: 6 bits
+Miss Rate: 1.279713%
+Read Transactions: 3880
+Write Transactions: 2887
