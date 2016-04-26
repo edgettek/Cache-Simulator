@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 		if(!strcmp(helpString, argv[i]))
 		{
 			//print out help text and terminate
-      printHelp(argv[0]);
+                        printHelp(argv[0]);
 			return 1; //return 1 for help termination
 		}
 		//check for size
@@ -127,8 +127,18 @@ int main(int argc, char* argv[])
 			return -1;
 		}
 	}
+  
+  
+  // FILE READING
+  FILE *fp;
+  fp = fopen(filename, "r");
 	
-  /* TODO: Probably should intitalize the cache */
+  
+  
+  // CACHE INITIALIZATION
+  
+  int [][] CACHE = new [][];
+  
 
   printf("Ways: %u; Sets: %u; Line Size: %uB\n", 0, 0, 0/* FIXME */);
   printf("Tag: %d bits; Index: %d bits; Offset: %d bits\n", 0, 0, 0/* FIXME */);
