@@ -1,5 +1,6 @@
 #include "cache.h"
 #include "trace.h"
+#include <math.h>
 
 int write_xactions = 0;
 int read_xactions = 0;
@@ -129,18 +130,41 @@ int main(int argc, char* argv[])
 	}
   
   
-  // FILE READING
-  FILE *fp;
-  fp = fopen(filename, "r");
-	
+  /*
+   * NOTES
+   * 
+   * filename = Name of Trace file
+   * 
+   * line = Block size
+   * 
+   * ways = # of ways
+   *
+   * size = Cache size (KB)
+   * 
+   */
+  
+
+  // TRACE ARRAY
+  
+  char ** traceInstr;
+  
+  traceInstr = traceGetLines(filename);
+  
   
   
   // CACHE INITIALIZATION
   
-  int [][] CACHE = new [][];
+  int offset = log2(line); 
   
-
-  printf("Ways: %u; Sets: %u; Line Size: %uB\n", 0, 0, 0/* FIXME */);
+  int setSize = line * ways;
+  
+  int numSet = (size * (pow(2,10)))/setSize;
+  
+  int cache[numSet][(2*ways) + 1];
+  
+  printf("LINE 1: %s", traceInstr[0]);
+  
+  printf("Ways: %u; Sets: %u; Line Size: %uB\n", ways, numSet, line);
   printf("Tag: %d bits; Index: %d bits; Offset: %d bits\n", 0, 0, 0/* FIXME */);
 
 	/* TODO: Now we read the trace file line by line */

@@ -4,3 +4,6 @@
 #include <ctype.h>
 #include <string.h>
 #include <assert.h>
+
+char ** traceToArray(char * fileName);
+char ** traceGetLines(char * fileName);
