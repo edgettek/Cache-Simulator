@@ -20,6 +20,24 @@ void printHelp(const char * prog) {
   printf("-lru: use LRU replacement policy instead of FIFO\n");
   */
 }
+
+uint32_t getIndex(int num, int tagNum, int offsetNum) {
+    
+    uint32_t result = num << tagNum;
+    
+    //printf("\t\tNum: %x\tTag: %d\tIndex First Shift: %x:\n", num, tagNum, result);
+    
+    return (uint32_t) (result >> ((tagNum + offsetNum)));
+}
+
+uint32_t getTag(int num, int tagNum) {
+    
+    
+    //printf("Num: %x\ttagNum: %d\t(32-tagNum): %d\t", num, tagNum, (32-tagNum));
+    
+    return (uint32_t) (num >> (32-tagNum));
+}
+
 /*
 	Main function. Feed to options to set the cache
 	
@@ -162,6 +180,17 @@ int main(int argc, char* argv[])
   
   int cache[numSet][(2*ways) + 1];
   
+  int k;
+  
+  for(i = 0; i < numSet; i++) {
+      for(k = 0; k < ((2*ways) + 1); k++) {
+          cache[i][k] = 0;
+          
+          //printf("[%d][%d]: %d\t", i, k, cache[i][k]);
+      }
+      //printf("\n");
+  }
+  
   int numIndex = log2(numSet);
   
   int numTag = 32 - offset - numIndex;
@@ -173,11 +202,47 @@ int main(int argc, char* argv[])
   
   char * currentInstr = malloc(sizeof(char*));
   
-  for(i = 0; i < instructionCount; i++) {
+  int tag, index;
+  
+  char instruction;
+  
+  int address;
+  
+  for(i = 0; i < 30; i++) {
+      
+      // ISOLATING INSTRUCTION AND ADDRESS
       
       currentInstr = traceInstr[i];
-      printf("Current Instruction: %s\n", currentInstr);
+      //printf("Current Instruction: %s\n", currentInstr);
       
+      instruction = currentInstr[0];
+      
+      currentInstr[0] = '0';
+
+      //printf("\tCurrent Instruction: %s\n", currentInstr);
+      
+      memmove (currentInstr, currentInstr+1, strlen(currentInstr+1) + 1);
+      
+      address = (int) strtol(currentInstr, NULL, 0);
+      
+      //printf("\tAddress: %x\n", address);
+      
+      tag = getTag(address, numTag);
+      
+      index = getIndex(address, numTag, offset);
+      
+      //printf("Tag: %x\tIndex: %x\n", tag, index);
+      
+      //
+      
+      if(instruction == 's') {
+          write_xactions++;
+      }
+      else {
+          read_xactions++;
+      }
+      
+      printf("\ninstruction: %c\twrite_xactions: %d\tread_xactions: %d\t", instruction, write_xactions, read_xactions);
       
       
       
@@ -194,3 +259,5 @@ int main(int argc, char* argv[])
 
   /* TODO: Cleanup */
 }
+
+

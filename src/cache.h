@@ -9,3 +9,4 @@ extern int write_xactions;
 extern int read_xactions;
 
 void printHelp(const char * prog);
+void initializeCache(int* cache, int length, int width);
