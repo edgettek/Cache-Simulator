@@ -5,5 +5,5 @@
 #include <string.h>
 #include <assert.h>
 
-char ** traceToArray(char * fileName);
-char ** traceGetLines(char * fileName);
+char ** traceGetLines(char * fileName, int lineCount);
+int traceLineCount(char* filename);

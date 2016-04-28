@@ -145,13 +145,13 @@ int main(int argc, char* argv[])
   
 
   // TRACE ARRAY
+  int instructionCount = traceLineCount(filename);
   
   char ** traceInstr;
+
+  traceInstr = traceGetLines(filename, instructionCount);
   
-  traceInstr = traceGetLines(filename);
-  
-  
-  
+
   // CACHE INITIALIZATION
   
   int offset = log2(line); 
@@ -162,14 +162,28 @@ int main(int argc, char* argv[])
   
   int cache[numSet][(2*ways) + 1];
   
-  printf("LINE 1: %s", traceInstr[0]);
+  int numIndex = log2(numSet);
+  
+  int numTag = 32 - offset - numIndex;
   
   printf("Ways: %u; Sets: %u; Line Size: %uB\n", ways, numSet, line);
-  printf("Tag: %d bits; Index: %d bits; Offset: %d bits\n", 0, 0, 0/* FIXME */);
+  printf("Tag: %d bits; Index: %d bits; Offset: %d bits\n", numTag, numIndex, offset);
 
-	/* TODO: Now we read the trace file line by line */
+  // READ TRACE INSTRUCTIONS
   
-  /* TODO: Now we simulate the cache */  
+  char * currentInstr = malloc(sizeof(char*));
+  
+  for(i = 0; i < instructionCount; i++) {
+      
+      currentInstr = traceInstr[i];
+      printf("Current Instruction: %s\n", currentInstr);
+      
+      
+      
+      
+  }
+  
+  
 
   /* Print results */
   printf("Miss Rate: %8lf%%\n", ((double) totalMisses) / ((double) totalMisses + (double) totalHits) * 100.0);
