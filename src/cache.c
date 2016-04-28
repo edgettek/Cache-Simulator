@@ -186,6 +186,10 @@ int main(int argc, char* argv[])
       for(k = 0; k < ((2*ways) + 1); k++) {
           cache[i][k] = 0;
           
+          if(k == ((2*ways))) {
+              cache[i][k] = 1;
+          }
+          
           //printf("[%d][%d]: %d\t", i, k, cache[i][k]);
       }
       //printf("\n");
@@ -208,7 +212,9 @@ int main(int argc, char* argv[])
   
   int address;
   
-  for(i = 0; i < 30; i++) {
+  int lastWay = 0;
+  
+  for(i = 0; i < instructionCount; i++) {
       
       // ISOLATING INSTRUCTION AND ADDRESS
       
@@ -235,20 +241,38 @@ int main(int argc, char* argv[])
       
       //
       
-      if(instruction == 's') {
-          write_xactions++;
-      }
-      else {
-          read_xactions++;
+      int z;
+      
+      int boolean = 0;
+      
+      for(z = 1; z < ((2*ways) + 1); z = z+2) {
+          if((cache[index][z] == tag) && (cache[index][z-1] == 1)) {
+              // HIT
+              boolean = 1;
+              totalHits++;
+              //printf("\nHIT");
+              break;
+             
+          }
+          
       }
       
-      printf("\ninstruction: %c\twrite_xactions: %d\tread_xactions: %d\t", instruction, write_xactions, read_xactions);
-      
+      if(boolean == 0) {
+            lastWay = cache[index][((2*ways))];
+            cache[index][lastWay] = tag;
+            
+            cache[index][lastWay-1] = 1;
+            
+            lastWay = (lastWay + 2) % ((2*ways));
+            totalMisses++;
+            //printf("\nMISS");
+              
+      }
       
       
   }
   
-  
+  printf("HITS: %d\tMisses: %d\n", totalHits, totalMisses);
 
   /* Print results */
   printf("Miss Rate: %8lf%%\n", ((double) totalMisses) / ((double) totalMisses + (double) totalHits) * 100.0);
