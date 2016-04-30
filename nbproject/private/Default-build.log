@@ -1,0 +1,1 @@
+gcc -o cacheSim src/cache.c src/trace.c -O3
