@@ -1,4 +1,4 @@
-FILES := src/cache.c src/trace.c
+FILES := src/cache.c src/trace.c src/hashtable.c
 
 cacheSim: $(FILES)
 	gcc -o $@ $^ -O3

@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <assert.h>
+#include "hashtable.h"
 
 extern int write_xactions;
 extern int read_xactions;

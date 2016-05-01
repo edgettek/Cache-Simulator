@@ -201,6 +201,16 @@ int main(int argc, char* argv[])
   
   printf("Ways: %u; Sets: %u; Line Size: %uB\n", ways, numSet, line);
   printf("Tag: %d bits; Index: %d bits; Offset: %d bits\n", numTag, numIndex, offset);
+  
+  // INITIALIZE ARRAY OF HASHTABLES
+  
+  table* hashtables = malloc(sizeof(table) * numSet);
+  
+  for(i = 0; i < numSet; i++) {
+      hashtables[i] = * hashTable_Create((double) instructionCount/(double) numSet);
+  }
+  
+  
 
   // READ TRACE INSTRUCTIONS
   
@@ -214,7 +224,13 @@ int main(int argc, char* argv[])
   
   int lastWay = 0;
   
+  int z, boolean;
+  
+  char* resultString = "uninitialized";
+  
   for(i = 0; i < instructionCount; i++) {
+      
+      resultString = "uninitialized";
       
       // ISOLATING INSTRUCTION AND ADDRESS
       
@@ -239,22 +255,30 @@ int main(int argc, char* argv[])
       
       //printf("Tag: %x\tIndex: %x\n", tag, index);
       
-      //
+      // CHECK IF THE TAG HAS BEEN SEEN BEFORE
+      // I.E. IS IT IN THE APPROPRIATE HASHTABLE
       
-      int z;
+      boolean = 0;
       
-      int boolean = 0;
-      
-      for(z = 1; z < ((2*ways) + 1); z = z+2) {
-          if((cache[index][z] == tag) && (cache[index][z-1] == 1)) {
-              // HIT
-              boolean = 1;
-              totalHits++;
-              //printf("\nHIT");
-              break;
-             
-          }
+      if(hashtable_contains(&hashtables[index], tag) == 0) {
+          resultString = "compulsory";
+          boolean = 0;
+      }
+      else {
           
+        boolean = 0;
+
+        for(z = 1; z < ((2*ways) + 1); z = z+2) {
+            if((cache[index][z] == tag) && (cache[index][z-1] == 1)) {
+                // HIT
+                boolean = 1;
+                totalHits++;
+                //printf("\nHIT");
+                break;
+
+            }
+
+        }
       }
       
       if(boolean == 0) {
@@ -265,14 +289,15 @@ int main(int argc, char* argv[])
             
             lastWay = (lastWay + 2) % ((2*ways));
             totalMisses++;
-            //printf("\nMISS");
+            
+            hashtables[index] = *ht_set(&hashtables[index], tag);
               
       }
       
-      
+      printf("\n%c 0x%x %s", instruction, address, resultString);
   }
   
-  printf("HITS: %d\tMisses: %d\n", totalHits, totalMisses);
+  printf("\n\nHITS: %d\tMisses: %d\n", totalHits, totalMisses);
 
   /* Print results */
   printf("Miss Rate: %8lf%%\n", ((double) totalMisses) / ((double) totalMisses + (double) totalHits) * 100.0);

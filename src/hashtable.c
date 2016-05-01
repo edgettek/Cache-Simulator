@@ -1,14 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "hashtable.h"
 
-
-
-struct hashtable {
-    int capacity;
-    int size;
-    int * table;
-};
+//struct hashtable {
+//    int capacity;
+//    int size;
+//    int * table;
+//};
 
 typedef struct hashtable table;
 
@@ -55,13 +54,15 @@ int ht_hash(table *hashtable, int key ) {
 }
 
 table* ht_set( table *hashtable, int key ) {
+    
+    if(hashtable_contains(hashtable, key) == 0) {
 	int bin = 0;
 	
 	bin = ht_hash( hashtable, key );
 
 	int start = bin - 1;
         
-        printf("\n\tChecking rehash: size: %d\tcapacity: %d\t2.0/3.0: %f", hashtable->size, hashtable->capacity, (2.0/3.0));
+        //printf("\n\tChecking rehash: size: %d\tcapacity: %d\t2.0/3.0: %f", hashtable->size, hashtable->capacity, (2.0/3.0));
         
         if(((double) hashtable->size/ (double) hashtable->capacity) > (2.0/3.0)) {
             printf("\n\tTIME TO REHASH!!!");
@@ -82,6 +83,11 @@ table* ht_set( table *hashtable, int key ) {
         hashtable->size = hashtable->size + 1;
         
         return hashtable;
+    }
+    else {
+        return hashtable;
+    }
+    
 
 }
 
