@@ -3,11 +3,6 @@
 #include <string.h>
 #include "hashtable.h"
 
-//struct hashtable {
-//    int capacity;
-//    int size;
-//    int * table;
-//};
 
 typedef struct hashtable table;
 
@@ -32,7 +27,7 @@ table *hashTable_Create(int capacity) {
 	}
     
     for( i = 0; i < capacity; i++ ) {
-        hashTable->table[i] = 0;
+        hashTable->table[i] = -666;
     }
 
     hashTable->capacity = capacity;
@@ -71,7 +66,7 @@ table* ht_set( table *hashtable, int key ) {
         }
         
         while (bin != start) {
-            if(hashtable->table[bin] == 0) {
+            if(hashtable->table[bin] == -666) {
                 hashtable->table[bin] = key;
                 break;
             }
@@ -98,7 +93,7 @@ table* hashTable_rehash(table *hashtable, int new_capacity) {
     int i;
     
     for(i = 0; i < hashtable->capacity; i++) {
-        if(hashtable->table[i] != 0) {
+        if(hashtable->table[i] != -666) {
             ht_set(hashtable2, hashtable->table[i]);
         }
     }
@@ -112,6 +107,10 @@ int hashtable_contains(table * hashtable, int key) {
     
     int i = val;
     val = (val - 1) % hashtable->capacity;
+    
+    if(val == -1) {
+        val = hashtable->capacity - 1;
+    }
     
     while(i != val) {
         if(hashtable->table[i] == key) {

@@ -11,10 +11,11 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/Users/KEdgette1/Documents/CSC%20252%20Projects/Project%2004/csc252-project4/src/cache.h</file>
-            <file>file:/Users/KEdgette1/Documents/CSC%20252%20Projects/Project%2004/csc252-project4/hashtable.c</file>
+            <file>file:/Users/KEdgette1/Documents/CSC%20252%20Projects/Project%2004/csc252-project4/src/hashtable.h</file>
             <file>file:/Users/KEdgette1/Documents/CSC%20252%20Projects/Project%2004/csc252-project4/src/trace.h</file>
             <file>file:/Users/KEdgette1/Documents/CSC%20252%20Projects/Project%2004/csc252-project4/src/trace.c</file>
             <file>file:/Users/KEdgette1/Documents/CSC%20252%20Projects/Project%2004/csc252-project4/src/cache.c</file>
+            <file>file:/Users/KEdgette1/Documents/CSC%20252%20Projects/Project%2004/csc252-project4/src/hashtable.c</file>
         </group>
     </open-files>
 </project-private>

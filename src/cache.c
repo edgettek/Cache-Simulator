@@ -161,6 +161,17 @@ int main(int argc, char* argv[])
    * 
    */
   
+  // INITIALIZE OUTPUT FILE
+  
+  char outputFileName[100];
+  
+  FILE *results;
+  
+  strcpy(outputFileName, filename);
+  
+  strcat(outputFileName, ".simulated");
+  
+  results = fopen(outputFileName, "w");
 
   // TRACE ARRAY
   int instructionCount = traceLineCount(filename);
@@ -224,9 +235,12 @@ int main(int argc, char* argv[])
   
   int lastWay = 0;
   
-  int z, boolean;
+  int j, z, boolean;
   
   char* resultString = "uninitialized";
+  char outputLine[100];
+  
+  int booleanValidBit = 0;
   
   for(i = 0; i < instructionCount; i++) {
       
@@ -259,6 +273,7 @@ int main(int argc, char* argv[])
       // I.E. IS IT IN THE APPROPRIATE HASHTABLE
       
       boolean = 0;
+      booleanValidBit = 0;
       
       if(hashtable_contains(&hashtables[index], tag) == 0) {
           resultString = "compulsory";
@@ -266,19 +281,38 @@ int main(int argc, char* argv[])
       }
       else {
           
-        boolean = 0;
+            boolean = 0;
 
-        for(z = 1; z < ((2*ways) + 1); z = z+2) {
-            if((cache[index][z] == tag) && (cache[index][z-1] == 1)) {
-                // HIT
-                boolean = 1;
-                totalHits++;
-                //printf("\nHIT");
-                break;
+            for(z = 1; z < ((2*ways) + 1); z = z+2) {
+                if((cache[index][z] == tag) && (cache[index][z-1] == 1)) {
+                    resultString = "hit";
+                    boolean = 1;
+                    totalHits++;
+                    //printf("\nHIT");
+                    break;
+
+                }
 
             }
-
-        }
+          
+            if(boolean == 0) {
+            
+                for(j = 0; j < numSet; j++) {
+                    for(z = 0; z < ((2*ways) + 1); z = z+2) {
+                        if(cache[j][z] == 0) {
+                            booleanValidBit = 1;
+                            break;
+                        }
+                    }
+                    if(booleanValidBit == 1) {
+                        break;
+                    }
+                }
+            }
+      }
+      
+      if(booleanValidBit == 1) {
+          resultString = "conflict";
       }
       
       if(boolean == 0) {
@@ -294,8 +328,20 @@ int main(int argc, char* argv[])
               
       }
       
-      printf("\n%c 0x%x %s", instruction, address, resultString);
+      if(strcmp(resultString, "uninitialized") == 0) {
+          resultString = "capacity";
+      }
+      
+      //sprintf("%c %#010x %s", instruction, address, resultString);
+      sprintf(outputLine, "%c 0x%08x %s\n", instruction, address, resultString);
+      //resultString = strcat(strcat(instruction, " "), 
+      fputs(outputLine, results);
   }
+  
+  // CLOSE OUTPUT FILE
+  
+  fclose(results);
+  
   
   printf("\n\nHITS: %d\tMisses: %d\n", totalHits, totalMisses);
 

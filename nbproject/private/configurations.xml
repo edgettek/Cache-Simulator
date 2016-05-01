@@ -7,6 +7,7 @@
       <df name="src">
         <in>cache.c</in>
         <in>cache.h</in>
+        <in>hashtable.c</in>
         <in>hashtable.h</in>
         <in>trace.c</in>
         <in>trace.h</in>
