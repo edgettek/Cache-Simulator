@@ -179,8 +179,8 @@ int main(int argc, char* argv[])
   char ** traceInstr;
 
   traceInstr = traceGetLines(filename, instructionCount);
-  
 
+  int  traceMiss[sizeof(traceInstr)];
   // CACHE INITIALIZATION
   
   int offset = log2(line); 
@@ -236,14 +236,16 @@ int main(int argc, char* argv[])
   int lastWay = 0;
   
   int j, z, boolean;
+
+  int cacheSize = ways * numSet;
   
   char* resultString = "uninitialized";
   char outputLine[100];
   
-  int booleanValidBit = 0;
+  int booleanConflict = 0;
   
   for(i = 0; i < instructionCount; i++) {
-      
+     traceMiss[i] = 0; 
       resultString = "uninitialized";
       
       // ISOLATING INSTRUCTION AND ADDRESS
@@ -273,7 +275,7 @@ int main(int argc, char* argv[])
       // I.E. IS IT IN THE APPROPRIATE HASHTABLE
       
       boolean = 0;
-      booleanValidBit = 0;
+      booleanConflict = 0;
       
       if(hashtable_contains(&hashtables[index], tag) == 0) {
           resultString = "compulsory";
@@ -282,12 +284,13 @@ int main(int argc, char* argv[])
       else {
           
             boolean = 0;
-
+	    // HIT
             for(z = 1; z < ((2*ways) + 1); z = z+2) {
                 if((cache[index][z] == tag) && (cache[index][z-1] == 1)) {
                     resultString = "hit";
                     boolean = 1;
                     totalHits++;
+//		    traceMiss[i] = 0;
                     //printf("\nHIT");
                     break;
 
@@ -296,24 +299,36 @@ int main(int argc, char* argv[])
             }
           
             if(boolean == 0) {
-            
-                for(j = 0; j < numSet; j++) {
-                    for(z = 0; z < ((2*ways) + 1); z = z+2) {
-                        if(cache[j][z] == 0) {
-                            booleanValidBit = 1;
-                            break;
-                        }
-                    }
-                    if(booleanValidBit == 1) {
-                        break;
-                    }
-                }
+            	// CONFLICT
+            	booleanConflict = 0;
+		j = i, z = cacheSize;
+             	while( j > 0 && z > 0) {
+		        int pastAddress = (int) strtol(traceInstr[j], NULL, 0);
+			printf("\nj == %d\tpastAddress == %x\ttraceMiss[j] == %d\tz == %d\tcacheSize == %d", j, pastAddress, traceMiss[j], z, cacheSize);
+			if( traceMiss[j] == 1 ) {
+				printf("\t\tIN IF. Z SHOULD BE DECREASING.");		
+				if( getTag(pastAddress, numTag) == tag ) {
+					printf("\t\t\t SHOULD BE BREAKING.");
+					booleanConflict = 1;
+					resultString = "conflict";
+					break;
+				}
+				z = z - 1;
+			}
+
+			if( booleanConflict == 1) {
+				printf("\t...SO CLOSE.");
+				break;
+			}
+
+			j = j - 1;
+		}
             }
       }
       
-      if(booleanValidBit == 1) {
-          resultString = "conflict";
-      }
+//      if(booleanValidBit == 1) {
+//          resultString = "conflict";
+//      }
       
       if(boolean == 0) {
             lastWay = cache[index][((2*ways))];
@@ -325,6 +340,7 @@ int main(int argc, char* argv[])
             totalMisses++;
             
             hashtables[index] = *ht_set(&hashtables[index], tag);
+	    traceMiss[i] = 1;
               
       }
       
