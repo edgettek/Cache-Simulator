@@ -213,6 +213,18 @@ int main(int argc, char* argv[])
   printf("Ways: %u; Sets: %u; Line Size: %uB\n", ways, numSet, line);
   printf("Tag: %d bits; Index: %d bits; Offset: %d bits\n", numTag, numIndex, offset);
   
+  // CONFLICT ARRAY INITIALIZATION
+  
+  int cacheSize = numSet * ways;
+  
+  int fullyAssociativeCache[cacheSize];
+  
+  for(i = 0; i < cacheSize; i++) {
+      fullyAssociativeCache[i] = -666;
+  }
+  
+  int missCounter = 0;
+  
   // INITIALIZE ARRAY OF HASHTABLES
   
   table* hashtables = malloc(sizeof(table) * numSet);
@@ -240,7 +252,7 @@ int main(int argc, char* argv[])
   char* resultString = "uninitialized";
   char outputLine[100];
   
-  int booleanValidBit = 0;
+  int fullyAssocBoolean = 0;
   
   for(i = 0; i < instructionCount; i++) {
       
@@ -273,7 +285,7 @@ int main(int argc, char* argv[])
       // I.E. IS IT IN THE APPROPRIATE HASHTABLE
       
       boolean = 0;
-      booleanValidBit = 0;
+      
       
       if(hashtable_contains(&hashtables[index], tag) == 0) {
           resultString = "compulsory";
@@ -297,23 +309,26 @@ int main(int argc, char* argv[])
           
             if(boolean == 0) {
             
-                for(j = 0; j < numSet; j++) {
-                    for(z = 0; z < ((2*ways) + 1); z = z+2) {
-                        if(cache[j][z] == 0) {
-                            booleanValidBit = 1;
-                            break;
-                        }
-                    }
-                    if(booleanValidBit == 1) {
+                for(z = 0; z < cacheSize; z++) {
+                    if(fullyAssociativeCache[z] == tag) {
+                        printf("\n\t\t\tFOUND IN FULLY ASSOC CACHE: z == %d\tcache == %x\ttag == %x", z, fullyAssociativeCache[z], tag);
+                        resultString = "conflict";
                         break;
                     }
                 }
+  
             }
       }
       
-      if(booleanValidBit == 1) {
-          resultString = "conflict";
+      
+      
+      if(strcmp(resultString, "conflict") == 0) {
+          printf("\n\ninstruction #: %d", i);
+          for(z = 0; z < cacheSize; z++) {
+             printf("\n\t[%d] == %x", z, fullyAssociativeCache[z]);
+          }
       }
+     
       
       if(boolean == 0) {
             lastWay = cache[index][((2*ways))];
@@ -324,12 +339,27 @@ int main(int argc, char* argv[])
             lastWay = (lastWay + 2) % ((2*ways));
             totalMisses++;
             
-            hashtables[index] = *ht_set(&hashtables[index], tag);
-              
+            hashtables[index] = *ht_set(&hashtables[index], tag);  
       }
       
       if(strcmp(resultString, "uninitialized") == 0) {
           resultString = "capacity";
+      }
+      
+      fullyAssocBoolean = 0;
+      
+      for(z = 0; z < cacheSize; z++) {
+          if(tag == fullyAssociativeCache[z]) {
+              fullyAssocBoolean = 1;
+              break;
+          }
+      }
+      
+      if(fullyAssocBoolean == 0) {
+          fullyAssociativeCache[missCounter] = tag;
+            
+          missCounter = (missCounter + 1) % cacheSize;
+          
       }
       
       //sprintf("%c %#010x %s", instruction, address, resultString);
