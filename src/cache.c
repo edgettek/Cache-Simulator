@@ -189,16 +189,18 @@ int main(int argc, char* argv[])
   
   int numSet = (size * (pow(2,10)))/setSize;
   
-  int cache[numSet][(2*ways) + 1];
+  int cacheWidth = (3*ways) + 1;
+  
+  int cache[numSet][cacheWidth];
   
   int k;
   
   for(i = 0; i < numSet; i++) {
-      for(k = 0; k < ((2*ways) + 1); k++) {
+      for(k = 0; k < cacheWidth; k++) {
           cache[i][k] = 0;
           
-          if(k == ((2*ways))) {
-              cache[i][k] = 1;
+          if(k == ((3*ways))) {
+              cache[i][k] = 2;
           }
           
           //printf("[%d][%d]: %d\t", i, k, cache[i][k]);
@@ -260,6 +262,8 @@ int main(int argc, char* argv[])
   
   for(i = 0; i < instructionCount; i++) {
       
+      //printf("\n\ni == %d", i+1);
+      
       resultString = "uninitialized";
       
       // ISOLATING INSTRUCTION AND ADDRESS
@@ -285,7 +289,7 @@ int main(int argc, char* argv[])
       
       index = getIndex(address, numTag, offset);
       
-      //printf("Tag: %x\tIndex: %x\n", tag, index);
+      //printf("\nTag: %x\tIndex: %d\n", tag, index);
       
       // CHECK IF THE TAG HAS BEEN SEEN BEFORE
       // I.E. IS IT IN THE APPROPRIATE HASHTABLE
@@ -301,11 +305,17 @@ int main(int argc, char* argv[])
           
             boolean = 0;
 
-            for(z = 1; z < ((2*ways) + 1); z = z+2) {
-                if((cache[index][z] == tag) && (cache[index][z-1] == 1)) {
+            for(z = 2; z < cacheWidth; z = z+3) {
+                if((cache[index][z] == tag) && (cache[index][z-2] == 1)) {
                     resultString = "hit";
                     boolean = 1;
                     totalHits++;
+                    
+                    if(instruction == 's') {
+                        cache[index][z-1] = 1;
+                    }
+                    
+                    
                     //printf("\nHIT");
                     break;
 
@@ -337,15 +347,31 @@ int main(int argc, char* argv[])
      
       
       if(boolean == 0) {
-            lastWay = cache[index][((2*ways))];
+            lastWay = cache[index][((3*ways))];
+            
+            if(cache[index][lastWay-1] == 1) {
+                write_xactions++;
+            }
+            
+            read_xactions++;
+            
             cache[index][lastWay] = tag;
             
-            cache[index][lastWay-1] = 1;
+            cache[index][lastWay-2] = 1;
             
-            lastWay = (lastWay + 2) % ((2*ways));
+            lastWay = (lastWay + 3) % ((3*ways));
+            cache[index][((3*ways))] = lastWay;
             totalMisses++;
             
             hashtables[index] = *ht_set(&hashtables[index], tag); 
+            
+            if(instruction == 'l') {
+                cache[index][lastWay-1] = 0;
+            }
+            else {
+                cache[index][lastWay-1] = 1;
+                
+            }
             
       }
       
@@ -375,6 +401,15 @@ int main(int argc, char* argv[])
           
       }
       
+      // PRINT CACHE
+      
+//      for(z = 0; z < numSet; z ++) {
+//          printf("\n");
+//          for(j = 0; j < ((3*ways) + 1); j++) {
+//              printf("\tcache[%d][%d] == %x", z, j, cache[z][j]);
+//          }
+//      }
+      
 //      printf("\ni == %x", i+1);
 //      
 //      for(z = 0; z < 50; z++) {
@@ -398,10 +433,10 @@ int main(int argc, char* argv[])
 //                }
   
   
-  printf("\n\nHITS: %d\tMisses: %d\n", totalHits, totalMisses);
+  //printf("\n\nHITS: %d\tMisses: %d\n", totalHits, totalMisses);
 
   /* Print results */
-  printf("Miss Rate: %8lf%%\n", ((double) totalMisses) / ((double) totalMisses + (double) totalHits) * 100.0);
+  printf("\nMiss Rate: %8lf%%\n", ((double) totalMisses) / ((double) totalMisses + (double) totalHits) * 100.0);
   printf("Read Transactions: %d\n", read_xactions);
   printf("Write Transactions: %d\n", write_xactions);
 

@@ -9,7 +9,7 @@
 
 char ** traceGetLines(char * filename, int lineCount) {
     
-    printf("Num lines in trace: %d\n", lineCount);
+    //printf("Num lines in trace: %d\n", lineCount);
     
     char ** lines = malloc(sizeof(char*) * lineCount * 2);
     
