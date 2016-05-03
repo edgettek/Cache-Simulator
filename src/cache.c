@@ -29,15 +29,10 @@ uint32_t getIndex(int num, int tagNum, int offsetNum) {
     
     uint32_t result = num << tagNum;
     
-    //printf("\t\tNum: %x\tTag: %d\tIndex First Shift: %x:\n", num, tagNum, result);
-    
     return (uint32_t) (result >> ((tagNum + offsetNum)));
 }
 
 uint32_t getTag(int num, int tagNum) {
-    
-    
-    //printf("Num: %x\ttagNum: %d\t(32-tagNum): %d\t", num, tagNum, (32-tagNum));
     
     return (uint32_t) (num >> (32-tagNum));
 }
@@ -207,14 +202,10 @@ int main(int argc, char* argv[])
               cache[i][k] = 2;
           }
           
-          //printf("[%d][%d]: %d\t", i, k, cache[i][k]);
       }
-      //printf("\n");
   }
   
   int numIndex = log2(numSet);
-  
-  printf("NumIndex == %d", numIndex);
   
   int numTag = 32 - offset - numIndex;
   
@@ -242,8 +233,6 @@ int main(int argc, char* argv[])
   for(i = 0; i < numSet; i++) {
       hashtables[i] = * hashTable_Create((double) instructionCount/(double) numSet);
   }
-  
-  
 
   // READ TRACE INSTRUCTIONS
   
@@ -268,49 +257,30 @@ int main(int argc, char* argv[])
   
   for(i = 0; i < instructionCount; i++) {
 
-      //printf("\n\ni == %d", i+1);
-      
-      
       resultString = "uninitialized";
       
       // ISOLATING INSTRUCTION AND ADDRESS
       
       currentInstr = traceInstr[i];
-      //printf("Current Instruction: %s\n", currentInstr);
       
       instruction = currentInstr[0];
       
       currentInstr[0] = '0';
-
-      //printf("\tCurrent Instruction: %s\n", currentInstr);
       
       memmove (currentInstr, currentInstr+1, strlen(currentInstr+1) + 1);
       
       address = (int) strtol(currentInstr, NULL, 0);
-      
-      //printf("\tAddress: %x\n", address);
       
       tag = getTag(address, numTag);
       
       conflictTag = getTag(address, numTagConflict);
       
       index = getIndex(address, numTag, offset);
-      //printf("\ncalling getIndex() address == %x\tnumTag == %d\toffset == %d", address, numTag, offset);
-      //printf("\nTag: %x\tIndex: %d\n", tag, index);
-      
-      // CHECK IF THE TAG HAS BEEN SEEN BEFORE
-      // I.E. IS IT IN THE APPROPRIATE HASHTABLE
-      
+
       boolean = 0;
-      //printf("\n\nTesting");
-      //printf("\n\nTesting");
       
-      //hashtables[index];
       
-      //printf("\nhelllllooooo");
-      
-      //printf("\n calling hashtable_contains on hashtable[%d] with tag == %x", index, tag);
-      
+      // COMPULSORY MISS CHECK
       if(hashtable_contains(&hashtables[index], tag) == 0) {
           //printf("\nTesting in compulsory");
           resultString = "compulsory";
@@ -319,6 +289,7 @@ int main(int argc, char* argv[])
       }
       else {
           
+            // HIT CHECK
             boolean = 0;
 
             for(z = 2; z < cacheWidth; z = z+3) {
@@ -327,23 +298,22 @@ int main(int argc, char* argv[])
                     boolean = 1;
                     totalHits++;
                     
+                    // FOR READ AND WRITE TRANSACTION COUNTER
                     if(instruction == 's') {
                         cache[index][z-1] = 1;
                     }
-                    
-                    
-                    //printf("\nHIT");
+
                     break;
 
                 }
 
             }
           
+            // CONFLICT MISS CHECK
             if(boolean == 0) {
             
                 for(z = 0; z < cacheSize; z++) {
                     if(fullyAssociativeCache[z] == conflictTag) {
-                        //printf("\n\t\t\tFOUND IN FULLY ASSOC CACHE: z == %d\tcache == %x\ttag == %x", z, fullyAssociativeCache[z], tag);
                         resultString = "conflict";
                         break;
                     }
@@ -351,17 +321,8 @@ int main(int argc, char* argv[])
   
             }
       }
-      
-      
-      
-//      if(strcmp(resultString, "conflict") == 0) {
-//          printf("\n\ninstruction #: %d", i);
-//          for(z = 0; z < cacheSize; z++) {
-//             //printf("\n\t[%d] == %x", z, fullyAssociativeCache[z]);
-//          }
-//      }
      
-      
+      // IF THERE IS A MISS, THEN WRITE THE TAG TO CACHE
       if(boolean == 0) {
             lastWay = cache[index][((3*ways))];
             
@@ -375,6 +336,7 @@ int main(int argc, char* argv[])
             
             cache[index][lastWay-2] = 1;
             
+            // FOR READ AND WRITE TRANSACTIONS
             if(instruction == 'l') {
                 cache[index][lastWay-1] = 0;
             }
@@ -391,9 +353,13 @@ int main(int argc, char* argv[])
 
       }
       
+      // IF THERE WAS A MISS, BUT IT IS NOT COMPULSORY OR CONFLICT, THEN CAPACITY MISS
       if(strcmp(resultString, "uninitialized") == 0) {
           resultString = "capacity";
       }
+      
+      
+      // CHECK IF TAG NEEDS TO BE ADDED TO FULLY ASSOCIATIVE CACHE
       
       fullyAssocBoolean = 0;
       
@@ -408,12 +374,6 @@ int main(int argc, char* argv[])
           fullyAssociativeCache[missCounter] = conflictTag;
             
           missCounter = (missCounter + 1) % cacheSize;
-          
-//          printf("\ni == %d", i+1);
-//
-//            for(z = 0; z < 50; z++) {
-//                printf("\n\t[%d] == %x", z, fullyAssociativeCache[z]);
-//            }
           
       }
       
@@ -434,14 +394,7 @@ int main(int argc, char* argv[])
 //          
 //      }
       
-      
-//      printf("\ni == %x", i+1);
-//      
-//      for(z = 0; z < 50; z++) {
-//          printf("\n\t[%d] == %x", z, fullyAssociativeCache[z]);
-//      }
-      
-      //sprintf("%c %#010x %s", instruction, address, resultString);
+
       sprintf(outputLine, "%c 0x%08x %s\n", instruction, address, resultString);
       //resultString = strcat(strcat(instruction, " "), 
       fputs(outputLine, results);
@@ -450,24 +403,13 @@ int main(int argc, char* argv[])
   // CLOSE OUTPUT FILE
   
   fclose(results);
-  
-//                for(z = 0; z < cacheSize; z++) {
-//                        printf("\n\tfullyAssocCache[%d] == %x", z, fullyAssociativeCache[z]);
-//                        resultString = "conflict";
-//                        
-//                }
-  
-  
-  //printf("\n\nHITS: %d\tMisses: %d\n", totalHits, totalMisses);
+
 
   /* Print results */
   printf("Miss Rate: %8lf%%\n", ((double) totalMisses) / ((double) totalMisses + (double) totalHits) * 100.0);
   printf("Read Transactions: %d\n", read_xactions);
   printf("Write Transactions: %d\n", write_xactions);
 
-  /* TODO: Now we output the file */
-
-  /* TODO: Cleanup */
 }
 
 

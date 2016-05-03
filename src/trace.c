@@ -1,15 +1,7 @@
 #include "trace.h"
 
-// Put anything for reading trace files / writing output files here.
-
-/* TODO: read trace file function */
-
-/* TODO: write output file function */
-
 
 char ** traceGetLines(char * filename, int lineCount) {
-    
-    //printf("Num lines in trace: %d\n", lineCount);
     
     char ** lines = malloc(sizeof(char*) * lineCount * 2);
     
@@ -28,8 +20,6 @@ char ** traceGetLines(char * filename, int lineCount) {
         fscanf(trace, "%s %s", loadOrStore, address);
         
         lines[i] = strdup(strcat(loadOrStore, address));
-        
-        //printf("line #%d: %s\n", i, lines[i]);
         
    }
     
