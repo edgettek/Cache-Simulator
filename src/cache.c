@@ -372,6 +372,12 @@ int main(int argc, char* argv[])
   
   fclose(results);
   
+                for(z = 0; z < cacheSize; z++) {
+                        printf("\n\tfullyAssocCache[%d] == %x", z, fullyAssociativeCache[z]);
+                        resultString = "conflict";
+                        
+                }
+  
   
   printf("\n\nHITS: %d\tMisses: %d\n", totalHits, totalMisses);
 
