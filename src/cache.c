@@ -23,6 +23,10 @@ void printHelp(const char * prog) {
 
 uint32_t getIndex(int num, int tagNum, int offsetNum) {
     
+    if(tagNum + offsetNum == 32) {
+        return 0;
+    }
+    
     uint32_t result = num << tagNum;
     
     //printf("\t\tNum: %x\tTag: %d\tIndex First Shift: %x:\n", num, tagNum, result);
@@ -210,6 +214,8 @@ int main(int argc, char* argv[])
   
   int numIndex = log2(numSet);
   
+  printf("NumIndex == %d", numIndex);
+  
   int numTag = 32 - offset - numIndex;
   
   printf("Ways: %u; Sets: %u; Line Size: %uB\n", ways, numSet, line);
@@ -261,8 +267,9 @@ int main(int argc, char* argv[])
   int fullyAssocBoolean = 0;
   
   for(i = 0; i < instructionCount; i++) {
-      
+
       //printf("\n\ni == %d", i+1);
+      
       
       resultString = "uninitialized";
       
@@ -288,18 +295,27 @@ int main(int argc, char* argv[])
       conflictTag = getTag(address, numTagConflict);
       
       index = getIndex(address, numTag, offset);
-      
+      //printf("\ncalling getIndex() address == %x\tnumTag == %d\toffset == %d", address, numTag, offset);
       //printf("\nTag: %x\tIndex: %d\n", tag, index);
       
       // CHECK IF THE TAG HAS BEEN SEEN BEFORE
       // I.E. IS IT IN THE APPROPRIATE HASHTABLE
       
       boolean = 0;
+      //printf("\n\nTesting");
+      //printf("\n\nTesting");
       
+      //hashtables[index];
+      
+      //printf("\nhelllllooooo");
+      
+      //printf("\n calling hashtable_contains on hashtable[%d] with tag == %x", index, tag);
       
       if(hashtable_contains(&hashtables[index], tag) == 0) {
+          //printf("\nTesting in compulsory");
           resultString = "compulsory";
           boolean = 0;
+               
       }
       else {
           
@@ -409,6 +425,15 @@ int main(int argc, char* argv[])
 //              printf("\tcache[%d][%d] == %x", z, j, cache[z][j]);
 //          }
 //      }
+      
+      // PRINT FULLY ASSOCIATIVE 512-WAY CACHE
+//      for(z = 0; z < ways; z=z+3) {
+//          printf("\n");
+//          
+//          printf("way[%d] == V=%d\tDirty=%d\tTag=%x", z, cache[0][z], cache[0][z+1], cache[0][z+2]);
+//          
+//      }
+      
       
 //      printf("\ni == %x", i+1);
 //      

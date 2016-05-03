@@ -15,8 +15,6 @@ l 0x00000514 compulsory
 l 0x00000578 compulsory
 l 0x000005dc compulsory
 l 0x00000640 compulsory
-l 0x0000012c conflict
-l 0x00000190 conflict
 l 0x000006a4 compulsory
 l 0x00000708 compulsory
 l 0x0000076c compulsory
@@ -33,15 +31,11 @@ l 0x00000b54 compulsory
 l 0x00000bb8 compulsory
 l 0x00000c1c compulsory
 l 0x00000c80 compulsory
-l 0x00000000 conflict
-l 0x000001f4 conflict
 l 0x00000258 conflict
 l 0x000002bc conflict
-l 0x00000320 conflict
-l 0x00000384 conflict
-l 0x000003e8 conflict
 l 0x0000044c conflict
 l 0x000004b0 conflict
+l 0x00000578 conflict
 l 0x00018802 compulsory
 l 0x00031004 compulsory
 l 0x00049806 compulsory
@@ -75,8 +69,6 @@ l 0x002df03c compulsory
 l 0x002f783e compulsory
 l 0x00310040 compulsory
 l 0x00000000 capacity
-l 0x0000044c capacity
-l 0x00000514 conflict
 l 0x00018802 capacity
 l 0x00031004 capacity
 l 0x00049806 capacity

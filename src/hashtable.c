@@ -42,9 +42,9 @@ int ht_hash(table *hashtable, int key ) {
 
 	unsigned long int hashval;
 	int i = 0;
-
+        //printf("\n\nin ht HASH");
 	hashval = key;
-
+        //printf("\nIn ht_hash()");
 	return hashval % hashtable->capacity;
 }
 
@@ -102,9 +102,11 @@ table* hashTable_rehash(table *hashtable, int new_capacity) {
 }
 
 int hashtable_contains(table * hashtable, int key) {
-    
+    //printf("\n\nTesting2");
+    //printf("\n\nTesting3");
     int val = ht_hash(hashtable, key);
-    
+    //printf("\n\nTesting4");
+    //printf("\n\nTesting5");
     int i = val;
     val = (val - 1) % hashtable->capacity;
     
