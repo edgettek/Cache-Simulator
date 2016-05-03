@@ -215,6 +215,8 @@ int main(int argc, char* argv[])
   
   // CONFLICT ARRAY INITIALIZATION
   
+  int numTagConflict = 32 - offset;
+  
   int cacheSize = numSet * ways;
   
   int fullyAssociativeCache[cacheSize];
@@ -240,6 +242,8 @@ int main(int argc, char* argv[])
   char * currentInstr = malloc(sizeof(char*));
   
   int tag, index;
+  
+  int conflictTag;
   
   char instruction;
   
@@ -277,6 +281,8 @@ int main(int argc, char* argv[])
       
       tag = getTag(address, numTag);
       
+      conflictTag = getTag(address, numTagConflict);
+      
       index = getIndex(address, numTag, offset);
       
       //printf("Tag: %x\tIndex: %x\n", tag, index);
@@ -310,8 +316,8 @@ int main(int argc, char* argv[])
             if(boolean == 0) {
             
                 for(z = 0; z < cacheSize; z++) {
-                    if(fullyAssociativeCache[z] == tag) {
-                        printf("\n\t\t\tFOUND IN FULLY ASSOC CACHE: z == %d\tcache == %x\ttag == %x", z, fullyAssociativeCache[z], tag);
+                    if(fullyAssociativeCache[z] == conflictTag) {
+                        //printf("\n\t\t\tFOUND IN FULLY ASSOC CACHE: z == %d\tcache == %x\ttag == %x", z, fullyAssociativeCache[z], tag);
                         resultString = "conflict";
                         break;
                     }
@@ -322,12 +328,12 @@ int main(int argc, char* argv[])
       
       
       
-      if(strcmp(resultString, "conflict") == 0) {
-          printf("\n\ninstruction #: %d", i);
-          for(z = 0; z < cacheSize; z++) {
-             printf("\n\t[%d] == %x", z, fullyAssociativeCache[z]);
-          }
-      }
+//      if(strcmp(resultString, "conflict") == 0) {
+//          printf("\n\ninstruction #: %d", i);
+//          for(z = 0; z < cacheSize; z++) {
+//             //printf("\n\t[%d] == %x", z, fullyAssociativeCache[z]);
+//          }
+//      }
      
       
       if(boolean == 0) {
@@ -339,7 +345,8 @@ int main(int argc, char* argv[])
             lastWay = (lastWay + 2) % ((2*ways));
             totalMisses++;
             
-            hashtables[index] = *ht_set(&hashtables[index], tag);  
+            hashtables[index] = *ht_set(&hashtables[index], tag); 
+            
       }
       
       if(strcmp(resultString, "uninitialized") == 0) {
@@ -349,18 +356,30 @@ int main(int argc, char* argv[])
       fullyAssocBoolean = 0;
       
       for(z = 0; z < cacheSize; z++) {
-          if(tag == fullyAssociativeCache[z]) {
+          if(conflictTag == fullyAssociativeCache[z]) {
               fullyAssocBoolean = 1;
               break;
           }
       }
       
       if(fullyAssocBoolean == 0) {
-          fullyAssociativeCache[missCounter] = tag;
+          fullyAssociativeCache[missCounter] = conflictTag;
             
           missCounter = (missCounter + 1) % cacheSize;
           
+//          printf("\ni == %d", i+1);
+//
+//            for(z = 0; z < 50; z++) {
+//                printf("\n\t[%d] == %x", z, fullyAssociativeCache[z]);
+//            }
+          
       }
+      
+//      printf("\ni == %x", i+1);
+//      
+//      for(z = 0; z < 50; z++) {
+//          printf("\n\t[%d] == %x", z, fullyAssociativeCache[z]);
+//      }
       
       //sprintf("%c %#010x %s", instruction, address, resultString);
       sprintf(outputLine, "%c 0x%08x %s\n", instruction, address, resultString);
@@ -372,11 +391,11 @@ int main(int argc, char* argv[])
   
   fclose(results);
   
-                for(z = 0; z < cacheSize; z++) {
-                        printf("\n\tfullyAssocCache[%d] == %x", z, fullyAssociativeCache[z]);
-                        resultString = "conflict";
-                        
-                }
+//                for(z = 0; z < cacheSize; z++) {
+//                        printf("\n\tfullyAssocCache[%d] == %x", z, fullyAssociativeCache[z]);
+//                        resultString = "conflict";
+//                        
+//                }
   
   
   printf("\n\nHITS: %d\tMisses: %d\n", totalHits, totalMisses);
