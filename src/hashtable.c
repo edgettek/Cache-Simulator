@@ -60,7 +60,7 @@ table* ht_set( table *hashtable, int key ) {
         //printf("\n\tChecking rehash: size: %d\tcapacity: %d\t2.0/3.0: %f", hashtable->size, hashtable->capacity, (2.0/3.0));
         
         if(((double) hashtable->size/ (double) hashtable->capacity) > (2.0/3.0)) {
-            printf("\n\tTIME TO REHASH!!!");
+            //printf("\n\tTIME TO REHASH!!!");
             table *newTable =  hashTable_rehash(hashtable, (hashtable->capacity * 3) + 1);
             hashtable = newTable;
         }

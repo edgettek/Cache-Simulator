@@ -359,12 +359,6 @@ int main(int argc, char* argv[])
             
             cache[index][lastWay-2] = 1;
             
-            lastWay = (lastWay + 3) % ((3*ways));
-            cache[index][((3*ways))] = lastWay;
-            totalMisses++;
-            
-            hashtables[index] = *ht_set(&hashtables[index], tag); 
-            
             if(instruction == 'l') {
                 cache[index][lastWay-1] = 0;
             }
@@ -373,6 +367,12 @@ int main(int argc, char* argv[])
                 
             }
             
+            lastWay = (lastWay + 3) % ((3*ways));
+            cache[index][((3*ways))] = lastWay;
+            totalMisses++;
+            
+            hashtables[index] = *ht_set(&hashtables[index], tag); 
+
       }
       
       if(strcmp(resultString, "uninitialized") == 0) {
@@ -436,7 +436,7 @@ int main(int argc, char* argv[])
   //printf("\n\nHITS: %d\tMisses: %d\n", totalHits, totalMisses);
 
   /* Print results */
-  printf("\nMiss Rate: %8lf%%\n", ((double) totalMisses) / ((double) totalMisses + (double) totalHits) * 100.0);
+  printf("Miss Rate: %8lf%%\n", ((double) totalMisses) / ((double) totalMisses + (double) totalHits) * 100.0);
   printf("Read Transactions: %d\n", read_xactions);
   printf("Write Transactions: %d\n", write_xactions);
 
